@@ -1,11 +1,35 @@
 %{
-#include "y.tab.h"
+#include <stdio.h>
+#include <stdlib.h>
+int yylex(void);
+void yyerror(const char *s);
 %}
+%token NUMBER
+%left '+' '-'
+%left '*' '/'
+%left UMINUS
 %%
-[0-9]+ { yylval = atoi(yytext); return
-NUMBER; }
-[+\-*/\n()] return yytext[0];
-[ \t] ; // ignore spaces
-. { return yytext[0]; } // for error characters
+input:
+input expr '\n' { printf("Valid
+Expression\n"); }
+|
+;
+expr:
+expr '+' expr
+| expr '-' expr
+| expr '*' expr
+| expr '/' expr
+| '(' expr ')'
+| '-' expr %prec UMINUS
+| NUMBER
+;
 %%
-int yywrap() { return 1; }
+void yyerror(const char *s) {
+printf("Invalid Expression\n");
+}
+int main() {
+printf("Enter arithmetic expressions
+(Ctrl+D to stop):\n");
+yyparse();
+return 0;
+}
